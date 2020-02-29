@@ -1,9 +1,0 @@
-sceneSetups:
-<<<<<<< HEAD
-- path: Assets/Enemy_AI/AITestScene.unity
-=======
-- path: Assets/AI_Test_0.1.unity
->>>>>>> mike
-  isLoaded: 1
-  isActive: 1
-  isSubScene: 0
