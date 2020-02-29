@@ -57,6 +57,14 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""expectedControlType"": """",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Pause"",
+                    ""type"": ""Button"",
+                    ""id"": ""9791d4b3-6419-4059-8f0f-ddb4c326be2b"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -114,6 +122,17 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                     ""action"": ""ReleaseAttack"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""89845434-d3c4-4023-b230-60c6dbc59c78"",
+                    ""path"": ""<Gamepad>/start"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -127,6 +146,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         m_Gameplay_Hello = m_Gameplay.FindAction("Hello", throwIfNotFound: true);
         m_Gameplay_Attack = m_Gameplay.FindAction("Attack", throwIfNotFound: true);
         m_Gameplay_ReleaseAttack = m_Gameplay.FindAction("ReleaseAttack", throwIfNotFound: true);
+        m_Gameplay_Pause = m_Gameplay.FindAction("Pause", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -181,6 +201,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
     private readonly InputAction m_Gameplay_Hello;
     private readonly InputAction m_Gameplay_Attack;
     private readonly InputAction m_Gameplay_ReleaseAttack;
+    private readonly InputAction m_Gameplay_Pause;
     public struct GameplayActions
     {
         private @PlayerControls m_Wrapper;
@@ -190,6 +211,7 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         public InputAction @Hello => m_Wrapper.m_Gameplay_Hello;
         public InputAction @Attack => m_Wrapper.m_Gameplay_Attack;
         public InputAction @ReleaseAttack => m_Wrapper.m_Gameplay_ReleaseAttack;
+        public InputAction @Pause => m_Wrapper.m_Gameplay_Pause;
         public InputActionMap Get() { return m_Wrapper.m_Gameplay; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -214,6 +236,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @ReleaseAttack.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnReleaseAttack;
                 @ReleaseAttack.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnReleaseAttack;
                 @ReleaseAttack.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnReleaseAttack;
+                @Pause.started -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPause;
+                @Pause.performed -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPause;
+                @Pause.canceled -= m_Wrapper.m_GameplayActionsCallbackInterface.OnPause;
             }
             m_Wrapper.m_GameplayActionsCallbackInterface = instance;
             if (instance != null)
@@ -233,6 +258,9 @@ public class @PlayerControls : IInputActionCollection, IDisposable
                 @ReleaseAttack.started += instance.OnReleaseAttack;
                 @ReleaseAttack.performed += instance.OnReleaseAttack;
                 @ReleaseAttack.canceled += instance.OnReleaseAttack;
+                @Pause.started += instance.OnPause;
+                @Pause.performed += instance.OnPause;
+                @Pause.canceled += instance.OnPause;
             }
         }
     }
@@ -244,5 +272,6 @@ public class @PlayerControls : IInputActionCollection, IDisposable
         void OnHello(InputAction.CallbackContext context);
         void OnAttack(InputAction.CallbackContext context);
         void OnReleaseAttack(InputAction.CallbackContext context);
+        void OnPause(InputAction.CallbackContext context);
     }
 }
