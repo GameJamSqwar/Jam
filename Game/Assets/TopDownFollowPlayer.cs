@@ -6,15 +6,14 @@ public class TopDownFollowPlayer : MonoBehaviour
 {
     public Transform player;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    public float smoothSpeed;
+    public Vector3 offset;
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        transform.position = new Vector3(player.position.x, player.position.y + 25, player.position.z - 12);
+        Vector3 desiredPosition = player.position + offset;
+        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+        transform.position = smoothedPosition;
     }
 }
