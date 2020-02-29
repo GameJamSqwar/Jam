@@ -12,6 +12,7 @@ public class Movement : MonoBehaviour
 	Vector2 i_rotation;
     public float moveSpeed;
     public float turningSpeed;
+    public Animator swordAnim;
 
     public Transform swordPos;
 
@@ -54,6 +55,7 @@ public class Movement : MonoBehaviour
     {
         if (!triggerDown)
         {
+            swordAnim.Play("Attack", -1, 0f);
             triggerDown = true;
         }
     }
