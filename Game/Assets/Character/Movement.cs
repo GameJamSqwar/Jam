@@ -3,35 +3,50 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Movement : MonoBehaviour
 {
     float health = 1f;
-	public Rigidbody rb;
+    public Rigidbody rb;
     Vector2 i_movement;
-	Vector2 i_rotation;
+    Vector2 i_rotation;
     public float moveSpeed;
     public float turningSpeed;
     public Slider slider;
     public Animator anim;
     bool attacking = false;
+    public float stopper;
+    public float damageTaken = 10f;
+    bool dead = false;
+    public AudioClip oofSoundEffect;
+    public AudioClip haaSoundEffect;
+    public AudioClip eughSoundEffect;
+    public AudioSource audioSource;
+    public Slider healthBar;
 
     public CapsuleCollider swordCollider;
 
-    void Start()
+    GameObject scoreText; 
+
+    private void Start()
     {
+        scoreText = GameObject.FindGameObjectWithTag("Score");
     }
 
     void Update()
     {
-		Move();
-        slider.value = health;
-        if (rb.velocity.x < 0.3 && rb.velocity.x > -0.3 && rb.velocity.z < 0.3 && rb.velocity.z > -0.3)
+        if (!dead)
         {
-            if (!attacking)
+            Move();
+            slider.value = health;
+            if (rb.velocity.x < stopper && rb.velocity.x > -stopper && rb.velocity.z < stopper && rb.velocity.z > -stopper)
             {
-                anim.SetBool("isWalking", false);
-                anim.Play("idle");
+                if (!attacking)
+                {
+                    anim.SetBool("isWalking", false);
+                    anim.Play("idle");
+                }
             }
         }
     }
@@ -57,7 +72,7 @@ public class Movement : MonoBehaviour
         Debug.Log("Moving!");
         i_movement = value.Get<Vector2>();
         i_rotation = value.Get<Vector2>();
-        if (!attacking)
+        if (!attacking && !dead)
         {
             anim.SetBool("isWalking", true);
             anim.Play("walk");
@@ -66,13 +81,27 @@ public class Movement : MonoBehaviour
 
     private void OnAttack()
     {
-        if (!attacking)
+        if (!attacking && !dead)
         {
-            attacking = true;
-            anim.Play("attack");
-            swordCollider.enabled = true;
-            InvokeRepeating("StopAttacking", 1.7f, 0);
+            Attack("attack", 2f);
         }
+    }
+
+    private void OnSlash()
+    {
+        if (!attacking && !dead)
+        {
+            Attack("slash", 1f);
+        }
+    }
+
+    void Attack(string an, float time)
+    {
+        audioSource.PlayOneShot(haaSoundEffect);
+        attacking = true;
+        anim.Play(an);
+        swordCollider.enabled = true;
+        InvokeRepeating("StopAttacking", time, 0);
     }
 
     private void StopAttacking()
@@ -85,5 +114,32 @@ public class Movement : MonoBehaviour
     public void OnPause()
     {
         GameObject.FindObjectOfType<PauseMenu>().TogglePause();
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.collider.CompareTag("EnemySword") || collision.collider.CompareTag("Sword"))
+        {
+            scoreText.GetComponent<Score>().ResetCombo();
+            audioSource.PlayOneShot(oofSoundEffect);
+            GetComponentInParent<PlayerStats>().TakeDamage(damageTaken);
+        } 
+    }
+
+    public void Die()
+    {
+        if (!dead)
+        {
+            audioSource.PlayOneShot(eughSoundEffect);
+            anim.Play("death");
+            Invoke("DieFully", 3.5f);
+            dead = true;
+        }
+    }
+
+    void DieFully()
+    {
+        DestroyObject(gameObject);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

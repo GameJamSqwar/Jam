@@ -32,12 +32,14 @@ public class PlayerStats : MonoBehaviour
     Rigidbody myBody;
 
     #endregion
+    public GameObject scoreText;
+    public Animator anim;
 
 
 
-    
     void Start()
     {
+        scoreText = GameObject.FindGameObjectWithTag("Score");
         myBody = GetComponent<Rigidbody>();
         HealthBar.maxValue = Health;
         HealthBar.value = Health;
@@ -86,8 +88,10 @@ public class PlayerStats : MonoBehaviour
             print("Player Has Died");
             //TODO: 
             //Go to main menu or death screen here
+            scoreText.GetComponent<Score>().ResetScore();
+            scoreText.GetComponent<Score>().ResetCombo();
 
-            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex );
+            GetComponent<Movement>().Die();
         }
 
         updateUI();
@@ -114,5 +118,10 @@ public class PlayerStats : MonoBehaviour
     {
         Health -= amnt;
         updateUI();
+    }
+
+    public void RecieveHealth(float amnt)
+    {
+        Health = (Health + amnt <= 100) ? Health + amnt : 100;
     }
 }

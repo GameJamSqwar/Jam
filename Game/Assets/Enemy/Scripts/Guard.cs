@@ -12,15 +12,28 @@ public class Guard : MonoBehaviour
     public int MaxDist;
     public int MinDist;
     private GameObject targetPlayer;
+    public Animator anim;
+    bool dead = false;
+    bool attacking = false;
+    Rigidbody rb;
+    public CapsuleCollider sword;
+    public GameObject scoreText;
+    public float recievedHealth;
+
+    public AudioClip hitSoundEffect;
+    public AudioClip eughSoundEffect;
+    public AudioSource audioSource;
 
     private NavMeshAgent navmesh;
 
     void Start()
     {
         navmesh = GetComponent<NavMeshAgent>();
+        rb = GetComponent<Rigidbody>();
 
         //Select player to target.
         GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        scoreText = GameObject.FindGameObjectWithTag("Score"); 
         //quicksort the list by 
         int playerQuantity = players.Length;
         if (playerQuantity > 2)
@@ -48,38 +61,42 @@ public class Guard : MonoBehaviour
 
     void Update()
     {
-        GameObject closestPlayer = FindClosestPlayer();
-
-        player = closestPlayer.transform;
-
-        if (Vector3.Distance(transform.position, player.position) >= MinDist)
+        if (!dead && !attacking)
         {
-            if (Vector3.Distance(transform.position, player.position) >= MaxDist)
+            GameObject closestPlayer = FindClosestPlayer();
+
+            player = closestPlayer.transform;
+
+            if (Vector3.Distance(transform.position, player.position) >= MinDist)
             {
-                //Find closest spawner and set it as destination if nearest player outside of max distance
-                GameObject closestSpawn = null;
-                float closestSpawnDistance = 0;
-                foreach (var spawnObject in GameObject.FindGameObjectsWithTag("Spawner"))
+                if (Vector3.Distance(transform.position, player.position) >= MaxDist)
                 {
-                    float spawnDistance = Vector3.Distance(transform.position, spawnObject.transform.position);
-                    if (closestSpawn == null)
+                    //Find closest spawner and set it as destination if nearest player outside of max distance
+                    GameObject closestSpawn = null;
+                    float closestSpawnDistance = 0;
+                    foreach (var spawnObject in GameObject.FindGameObjectsWithTag("Spawner"))
                     {
-                        closestSpawn = spawnObject;
-                        closestSpawnDistance = spawnDistance;
-                    }
-                    else
-                    {
-                        if (spawnDistance < closestSpawnDistance)
+                        float spawnDistance = Vector3.Distance(transform.position, spawnObject.transform.position);
+                        if (closestSpawn == null)
                         {
                             closestSpawn = spawnObject;
                             closestSpawnDistance = spawnDistance;
                         }
+                        else
+                        {
+                            if (spawnDistance < closestSpawnDistance)
+                            {
+                                closestSpawn = spawnObject;
+                                closestSpawnDistance = spawnDistance;
+                            }
+                        }
                     }
                 }
-            }
-            else //If position is greater than minimum distance but less than max distance
-            {
-                navmesh.SetDestination(closestPlayer.transform.position);
+                else //If position is greater than minimum distance but less than max distance
+                {
+                    navmesh.SetDestination(closestPlayer.transform.position);
+                    anim.Play("walk");
+                }
             }
         }
     }
@@ -112,22 +129,51 @@ public class Guard : MonoBehaviour
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.collider.CompareTag("Sword"))
+        if (!dead)
         {
-            Destroy(gameObject);
-        }
-       
-        if (collision.collider.CompareTag("Player"))
-        {
-            GameObject playerCollided = collision.collider.gameObject;
-            /*
-            //playerCollided.GetComponent<Slider>().value -= 0.1f;
-            //playerCollided.GetComponentInChildren<Slider>().value -= 0.1f;
-            //playerCollided.GetComponentInParent<Slider>().value -= 0.1f;
-            */
+            if (collision.collider.CompareTag("Sword"))
+            {
+                audioSource.PlayOneShot(eughSoundEffect);
+                scoreText.GetComponent<Score>().IncreaseCombo();
+                scoreText.GetComponent<Score>().AddToScore(10);
+                GameObject playerCollided = collision.collider.gameObject;
+                playerCollided.GetComponentInParent<PlayerStats>().RecieveHealth(recievedHealth);
+                GetComponent<CapsuleCollider>().enabled = false;
+                anim.Play("death");
+                Invoke("Die", 3.5f);
+                dead = true;
+                rb.freezeRotation = true;
+                sword.enabled = false;
+                scoreText.GetComponent<Score>().AddToScore(10);
+            }
 
-            //playerCollided.GetComponent<PlayerStats>().TakeDamage(100);
-            playerCollided.GetComponentInParent<PlayerStats>().TakeDamage(10);
+            if (!dead && !attacking)
+            {
+                if (collision.collider.CompareTag("Player"))
+                {
+                    GameObject playerCollided = collision.collider.gameObject;
+
+                    //playerCollided.GetComponentInParent<PlayerStats>().TakeDamage(10);
+                    anim.Play("attack");
+                    attacking = true;
+                    Invoke("EndAttack", 1.7f);
+                    sword.enabled = true;
+                    rb.freezeRotation = true;
+                }
+            }
         }
+    }
+
+    void EndAttack()
+    {
+        attacking = false;
+        sword.enabled = false;
+        rb.freezeRotation = false;
+    }
+
+    void Die()
+    {
+        Destroy(gameObject);
+        sword.enabled = false;
     }
 }

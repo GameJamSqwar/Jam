@@ -6,6 +6,10 @@ TagManager:
   tags:
   - Enemy
   - Sword
+  - Spawner
+  - EnemySword
+  - PlayerSpawn
+  - Score
   layers:
   - Default
   - TransparentFX
