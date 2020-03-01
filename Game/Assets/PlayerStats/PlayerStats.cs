@@ -2,14 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerStats : MonoBehaviour
 {
     #region Variables
 
     public float Health;
-    public float healthOverTime;
-
+    public float healthDrainOverTime;
+    /*
     public float Stamina;
     public float staminaOverTime;
 
@@ -18,15 +19,16 @@ public class PlayerStats : MonoBehaviour
 
     public float Thirst;
     public float thirstOverTime;
-
+    */
     public Slider HealthBar;
+    /*
     public Slider StaminaBar;
     public Slider HungerBar;
     public Slider ThirstBar;
-
+    
     public float minAmount = 5f;
     public float sprintSpeed = 5f;
-
+    */
     Rigidbody myBody;
 
     #endregion
@@ -38,20 +40,27 @@ public class PlayerStats : MonoBehaviour
     {
         myBody = GetComponent<Rigidbody>();
         HealthBar.maxValue = Health;
+        HealthBar.value = Health;
+        /*
         StaminaBar.maxValue = Stamina;
         HungerBar.maxValue = Hunger;
         ThirstBar.maxValue = Thirst;
+        */
     }
 
     
     void Update()
     {
-        
+        CalculateValues();
     }
 
     private void CalculateValues()
     {
-
+        if (healthDrainOverTime != 0)
+        {
+            Health -= healthDrainOverTime;
+        }
+        /*
         Hunger -= hungerOverTime * Time.deltaTime;
         Thirst -= thirstOverTime * Time.deltaTime;
 
@@ -71,10 +80,14 @@ public class PlayerStats : MonoBehaviour
         {
             Stamina += staminaOverTime * Time.deltaTime;
         }
-
+        */
         if (Health <= 0)
         {
             print("Player Has Died");
+            //TODO: 
+            //Go to main menu or death screen here
+
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex );
         }
 
         updateUI();
@@ -82,16 +95,19 @@ public class PlayerStats : MonoBehaviour
 
     private void updateUI()
     {
-
         Health = Mathf.Clamp(Health, 0, 100f);
+        /*
         Stamina = Mathf.Clamp(Stamina, 0, 100f);
         Hunger = Mathf.Clamp(Hunger, 0, 100f);
         Thirst = Mathf.Clamp(Thirst, 0, 100f);
+        */
 
         HealthBar.value = Health;
+        /*
         StaminaBar.value = Stamina;
         HungerBar.value = Hunger;
         ThirstBar.value = Thirst;
+        */
     }
 
     public void TakeDamage(float amnt)

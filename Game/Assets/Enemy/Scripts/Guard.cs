@@ -116,12 +116,18 @@ public class Guard : MonoBehaviour
         {
             Destroy(gameObject);
         }
-        /*
+       
         if (collision.collider.CompareTag("Player"))
         {
             GameObject playerCollided = collision.collider.gameObject;
-            //using the game object do damage to that player.
+            /*
+            //playerCollided.GetComponent<Slider>().value -= 0.1f;
+            //playerCollided.GetComponentInChildren<Slider>().value -= 0.1f;
+            //playerCollided.GetComponentInParent<Slider>().value -= 0.1f;
+            */
+
+            //playerCollided.GetComponent<PlayerStats>().TakeDamage(100);
+            playerCollided.GetComponentInParent<PlayerStats>().TakeDamage(10);
         }
-        */
     }
 }
