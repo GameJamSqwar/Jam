@@ -14,14 +14,6 @@
                     "interactions": ""
                 },
                 {
-                    "name": "Rotate",
-                    "type": "Button",
-                    "id": "a13db1d0-6082-4048-8e55-6aa6d79ef0d5",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
                     "name": "Hello",
                     "type": "Button",
                     "id": "5a8a1712-6b32-499f-bab6-43a20ddec942",
@@ -33,14 +25,6 @@
                     "name": "Attack",
                     "type": "Button",
                     "id": "bbf7b772-192f-4ac4-a7b3-e4dd5444a9a0",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": ""
-                },
-                {
-                    "name": "ReleaseAttack",
-                    "type": "Button",
-                    "id": "57fefa74-9154-4551-bb3e-bcfc06028301",
                     "expectedControlType": "",
                     "processors": "",
                     "interactions": ""
@@ -68,17 +52,6 @@
                 },
                 {
                     "name": "",
-                    "id": "9ace6102-1ab1-436b-b8cd-2a61b03fdbda",
-                    "path": "<Gamepad>/rightStick",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Rotate",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "609d7519-c700-4a0f-a8f2-c79b59389872",
                     "path": "<Gamepad>/buttonSouth",
                     "interactions": "",
@@ -96,17 +69,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Attack",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "4b8d6cc4-6b78-4b20-a3f1-a5ec8b45504e",
-                    "path": "<Gamepad>/rightTrigger",
-                    "interactions": "Press(behavior=1)",
-                    "processors": "",
-                    "groups": "",
-                    "action": "ReleaseAttack",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

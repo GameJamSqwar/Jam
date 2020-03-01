@@ -25,22 +25,25 @@ public class Guard : MonoBehaviour
 
         GameObject closestPlayer = FindClosestPlayer();
 
-        player = closestPlayer.transform;
-
-        transform.LookAt(player);
-
-        if (Vector3.Distance(transform.position, player.position) >= MinDist)
+        if (closestPlayer)
         {
+            player = closestPlayer.transform;
 
-            transform.position += transform.forward * MoveSpeed * Time.deltaTime;
+            transform.LookAt(player);
 
-
-
-            if (Vector3.Distance(transform.position, player.position) <= MaxDist)
+            if (Vector3.Distance(transform.position, player.position) >= MinDist)
             {
-                //Here Call any function U want Like Shoot at here or something
-            }
 
+                transform.position += transform.forward * MoveSpeed * Time.deltaTime;
+
+
+
+                if (Vector3.Distance(transform.position, player.position) <= MaxDist)
+                {
+                    //Here Call any function U want Like Shoot at here or something
+                }
+
+            }
         }
     }
 
