@@ -13,6 +13,8 @@ public class Movement : MonoBehaviour
     public float moveSpeed;
     public float turningSpeed;
 
+    public CapsuleCollider swordCollider;
+    public Animator swordAnim;
     public Transform swordPos;
 
     void Start()
@@ -54,6 +56,9 @@ public class Movement : MonoBehaviour
     {
         if (!triggerDown)
         {
+            swordAnim.Play("Attack", -1, 0f);
+            swordCollider.enabled = true;
+            InvokeRepeating("StopAttacking", 1, 0);
             triggerDown = true;
         }
     }
@@ -61,5 +66,16 @@ public class Movement : MonoBehaviour
     private void OnReleaseAttack()
     {
         triggerDown = false;
+    }
+
+    private void StopAttacking()
+    {
+        swordCollider.enabled = false;
+        CancelInvoke("StopAttacking");
+    }
+
+    public void OnPause()
+    {
+        GameObject.FindObjectOfType<PauseMenu>().TogglePause();
     }
 }
