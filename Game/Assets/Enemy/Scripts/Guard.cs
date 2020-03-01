@@ -7,42 +7,79 @@ using UnityEngine.UI;
 
 public class Guard : MonoBehaviour
 {
-    Transform player;
+    Transform player = null;
     public int MoveSpeed;
     public int MaxDist;
     public int MinDist;
+    private GameObject targetPlayer;
 
     private NavMeshAgent navmesh;
 
     void Start()
     {
         navmesh = GetComponent<NavMeshAgent>();
+
+        //Select player to target.
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //quicksort the list by 
+        int playerQuantity = players.Length;
+        if (playerQuantity > 2)
+        {
+            //More than two players
+            //quicksort the list of players by their number of enemies tracking them.
+            //Then set the AI to target the player with the least AI tracking.
+            //If there are multiple players who are tied for lowest, go for the closest player in that list. 
+            //Try to path to chosen player. If you cannot path to chosen player either go for a random player or choose next player with least tracking.
+        }
+        else if (playerQuantity == 2)
+        {
+            //Two players
+            //NOTE: Attempt at getting each players current number of targeted people. 
+            //These should be compared and the player with less enemies tracking should be targeted. 
+            Component player1 = players[0].GetComponent("Player");
+            Component player2 = players[1].GetComponent("Player");
+        }
+        else
+        {
+            //Only one player
+
+        }
     }
 
     void Update()
     {
-        //var distance = Vector3.Distance(transform.position, target.position);
-
         GameObject closestPlayer = FindClosestPlayer();
 
-        if (closestPlayer)
+        player = closestPlayer.transform;
+
+        if (Vector3.Distance(transform.position, player.position) >= MinDist)
         {
-            player = closestPlayer.transform;
-
-            transform.LookAt(player);
-
-            if (Vector3.Distance(transform.position, player.position) >= MinDist)
+            if (Vector3.Distance(transform.position, player.position) >= MaxDist)
             {
-
-                transform.position += transform.forward * MoveSpeed * Time.deltaTime;
-
-
-
-                if (Vector3.Distance(transform.position, player.position) <= MaxDist)
+                //Find closest spawner and set it as destination if nearest player outside of max distance
+                GameObject closestSpawn = null;
+                float closestSpawnDistance = 0;
+                foreach (var spawnObject in GameObject.FindGameObjectsWithTag("Spawner"))
                 {
-                    //Here Call any function U want Like Shoot at here or something
+                    float spawnDistance = Vector3.Distance(transform.position, spawnObject.transform.position);
+                    if (closestSpawn == null)
+                    {
+                        closestSpawn = spawnObject;
+                        closestSpawnDistance = spawnDistance;
+                    }
+                    else
+                    {
+                        if (spawnDistance < closestSpawnDistance)
+                        {
+                            closestSpawn = spawnObject;
+                            closestSpawnDistance = spawnDistance;
+                        }
+                    }
                 }
-
+            }
+            else //If position is greater than minimum distance but less than max distance
+            {
+                navmesh.SetDestination(closestPlayer.transform.position);
             }
         }
     }
@@ -79,5 +116,12 @@ public class Guard : MonoBehaviour
         {
             Destroy(gameObject);
         }
+        /*
+        if (collision.collider.CompareTag("Player"))
+        {
+            GameObject playerCollided = collision.collider.gameObject;
+            //using the game object do damage to that player.
+        }
+        */
     }
 }
