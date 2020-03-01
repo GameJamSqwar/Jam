@@ -11,12 +11,39 @@ public class Guard : MonoBehaviour
     public int MoveSpeed;
     public int MaxDist;
     public int MinDist;
+    private GameObject targetPlayer;
 
     private NavMeshAgent navmesh;
 
     void Start()
     {
         navmesh = GetComponent<NavMeshAgent>();
+
+        //Select player to target.
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        //quicksort the list by 
+        int playerQuantity = players.Length;
+        if (playerQuantity > 2)
+        {
+            //More than two players
+            //quicksort the list of players by their number of enemies tracking them.
+            //Then set the AI to target the player with the least AI tracking.
+            //If there are multiple players who are tied for lowest, go for the closest player in that list. 
+            //Try to path to chosen player. If you cannot path to chosen player either go for a random player or choose next player with least tracking.
+        }
+        else if (playerQuantity == 2)
+        {
+            //Two players
+            //NOTE: Attempt at getting each players current number of targeted people. 
+            //These should be compared and the player with less enemies tracking should be targeted. 
+            Component player1 = players[0].GetComponent("Player");
+            Component player2 = players[1].GetComponent("Player");
+        }
+        else
+        {
+            //Only one player
+
+        }
     }
 
     void Update()

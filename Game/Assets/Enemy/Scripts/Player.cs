@@ -4,12 +4,17 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public int seekingCount;
     private Rigidbody rb;
+
+    public int GetSeekerCount() { return seekingCount; }
+    public void SetSeekerCount(int newCount) { seekingCount = newCount; }
 
     // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        seekingCount = 0;
     }
 
     // Update is called once per frame
@@ -24,4 +29,6 @@ public class Player : MonoBehaviour
         if (Input.GetKey(KeyCode.RightArrow))
             rb.AddForce(Vector3.right * 5);
     }
+    
+
 }
