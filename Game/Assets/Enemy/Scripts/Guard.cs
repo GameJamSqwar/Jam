@@ -1,0 +1,179 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.UI;
+
+
+public class Guard : MonoBehaviour
+{
+    Transform player = null;
+    public int MoveSpeed;
+    public int MaxDist;
+    public int MinDist;
+    private GameObject targetPlayer;
+    public Animator anim;
+    bool dead = false;
+    bool attacking = false;
+    Rigidbody rb;
+    public CapsuleCollider sword;
+    public GameObject scoreText;
+    public float recievedHealth;
+
+    public AudioClip hitSoundEffect;
+    public AudioClip eughSoundEffect;
+    public AudioSource audioSource;
+
+    private NavMeshAgent navmesh;
+
+    void Start()
+    {
+        navmesh = GetComponent<NavMeshAgent>();
+        rb = GetComponent<Rigidbody>();
+
+        //Select player to target.
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+        scoreText = GameObject.FindGameObjectWithTag("Score"); 
+        //quicksort the list by 
+        int playerQuantity = players.Length;
+        if (playerQuantity > 2)
+        {
+            //More than two players
+            //quicksort the list of players by their number of enemies tracking them.
+            //Then set the AI to target the player with the least AI tracking.
+            //If there are multiple players who are tied for lowest, go for the closest player in that list. 
+            //Try to path to chosen player. If you cannot path to chosen player either go for a random player or choose next player with least tracking.
+        }
+        else if (playerQuantity == 2)
+        {
+            //Two players
+            //NOTE: Attempt at getting each players current number of targeted people. 
+            //These should be compared and the player with less enemies tracking should be targeted. 
+            Component player1 = players[0].GetComponent("Player");
+            Component player2 = players[1].GetComponent("Player");
+        }
+        else
+        {
+            //Only one player
+
+        }
+    }
+
+    void Update()
+    {
+        if (!dead && !attacking)
+        {
+            GameObject closestPlayer = FindClosestPlayer();
+
+            player = closestPlayer.transform;
+
+            if (Vector3.Distance(transform.position, player.position) >= MinDist)
+            {
+                if (Vector3.Distance(transform.position, player.position) >= MaxDist)
+                {
+                    //Find closest spawner and set it as destination if nearest player outside of max distance
+                    GameObject closestSpawn = null;
+                    float closestSpawnDistance = 0;
+                    foreach (var spawnObject in GameObject.FindGameObjectsWithTag("Spawner"))
+                    {
+                        float spawnDistance = Vector3.Distance(transform.position, spawnObject.transform.position);
+                        if (closestSpawn == null)
+                        {
+                            closestSpawn = spawnObject;
+                            closestSpawnDistance = spawnDistance;
+                        }
+                        else
+                        {
+                            if (spawnDistance < closestSpawnDistance)
+                            {
+                                closestSpawn = spawnObject;
+                                closestSpawnDistance = spawnDistance;
+                            }
+                        }
+                    }
+                }
+                else //If position is greater than minimum distance but less than max distance
+                {
+                    navmesh.SetDestination(closestPlayer.transform.position);
+                    anim.Play("walk");
+                }
+            }
+        }
+    }
+
+    private GameObject FindClosestPlayer()
+    {
+        GameObject closestPlayer = null;
+        float closestDistance = 0;
+
+        foreach (var playerObject in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            float distance = Vector3.Distance(transform.position, playerObject.transform.position);
+            if (closestPlayer == null)
+            {
+                closestPlayer = playerObject;
+                closestDistance = distance;
+            }
+            else
+            {
+                if (distance < closestDistance)
+                {
+                    closestPlayer = playerObject;
+                    closestDistance = distance;
+                }
+            }
+        }
+
+        return closestPlayer;
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (!dead)
+        {
+            if (collision.collider.CompareTag("Sword"))
+            {
+                audioSource.PlayOneShot(eughSoundEffect);
+                scoreText.GetComponent<Score>().IncreaseCombo();
+                scoreText.GetComponent<Score>().AddToScore(10);
+                GameObject playerCollided = collision.collider.gameObject;
+                playerCollided.GetComponentInParent<PlayerStats>().RecieveHealth(recievedHealth);
+                GetComponent<CapsuleCollider>().enabled = false;
+                anim.Play("death");
+                Invoke("Die", 3.5f);
+                dead = true;
+                rb.freezeRotation = true;
+                sword.enabled = false;
+                scoreText.GetComponent<Score>().AddToScore(10);
+            }
+
+            if (!dead && !attacking)
+            {
+                if (collision.collider.CompareTag("Player"))
+                {
+                    GameObject playerCollided = collision.collider.gameObject;
+
+                    //playerCollided.GetComponentInParent<PlayerStats>().TakeDamage(10);
+                    anim.Play("attack");
+                    attacking = true;
+                    Invoke("EndAttack", 1.7f);
+                    sword.enabled = true;
+                    rb.freezeRotation = true;
+                }
+            }
+        }
+    }
+
+    void EndAttack()
+    {
+        attacking = false;
+        sword.enabled = false;
+        rb.freezeRotation = false;
+    }
+
+    void Die()
+    {
+        Destroy(gameObject);
+        sword.enabled = false;
+    }
+}
